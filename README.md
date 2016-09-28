@@ -11,7 +11,7 @@ Practise a foreign language fast and easy, and improve your communication skills
 
 ## Install
 
-Install asciilang using [npm](https://www.npmjs.com/) (we assume you have pre-installed [node.js](https://nodejs.org/)).
+Install codelang using [npm](https://www.npmjs.com/) (we assume you have pre-installed [node.js](https://nodejs.org/)).
 
 ```bash
 npm install codelang --save-dev
