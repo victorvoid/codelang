@@ -1,3 +1,4 @@
+const base_url = 'http://localhost:8888';
 //LocalStorage
 let get = function (key) {
   return window.localStorage ? window.localStorage[key] : null;
@@ -83,7 +84,7 @@ let codelang = function() {
 	function alert(type, message, seconds) {
 		if (options.colorText.length > 0) alertText.style.color = options.colorText;	
 		blur();
-    wasClickedCounter++;
+    	wasClickedCounter++;
 		setTimeout(function() {
 			wasClickedCounter--;
 		}, (options.animationDelay + 10));
@@ -155,7 +156,6 @@ let codelang = function() {
   }
 
 	function alertHide(callback) {
-
 		alertOuter.style.top = '-' + alertOuter.offsetHeight - 5 + 'px';
 		setTimeout(function() {
 			removeClass(alertOuter, 'notie-transition');
@@ -322,10 +322,7 @@ let codelang = function() {
 			inputIsShowing = false;
 		}, (options.animationDelay + 10));
 	}
-	/** Select **/
-	// confirm
-  // **************
-
+// Select
   var confirmOuter = document.createElement('div')
   confirmOuter.id = 'notie-confirm-outer'
 
@@ -510,100 +507,292 @@ let codelang = function() {
       }
     } 
   });
+
+  //Start application with args (category, interval)
+  let codelangStart = (category = 0, minutesInterval = 15) => {
+		let request = new XMLHttpRequest();
+		let phrases = {};
+		request.open('GET', base_url+'/api/eng/readphrases/?id='+category, true);
+		request.onload = function() {
+			if (request.status >= 200 && request.status < 400) {
+				phrases = JSON.parse(request.responseText).phrases;
+				// console.log(phrases);
+			} else {
+				// We reached our target server, but it returned an error
+				console.log("error in server");
+			}
+		};
+		request.onerror = function() {
+		// There was a connection error of some sort
+		};
+		request.send();
+
+		//User doing
+		var user = {
+			nivel: "1", 
+			timestamp: new Date().getTime(),
+			par: true
+		}
+
+		//Start time
+		let nowMinute = new Date().getMinutes();
+		let now = new Date().getTime();
+		//Welcome user
+		if (get("codelang") == null ) {
+				alert(4, 'Welcome to the codelang! :D', 3);
+				put("codelang", JSON.stringify(user));
+				put("even", true);
+		}
+		function getRandomQuestion(){
+			let randOddNumber = 1;
+			let rand = Math.floor(Math.random() * phrases.length);
+			if(rand != 0)
+				randOddNumber = rand % 2 == 0 ? rand - 1 : rand; //need to be odd 
+
+			let randQuestion = phrases[randOddNumber].toLowerCase();
+				randQuestion = removeDot(randQuestion);
+			let responseQuestion = phrases[randOddNumber - 1].toLowerCase();
+				responseQuestion = removeDot(responseQuestion);
+
+			// console.log(randQuestion, responseQuestion);
+			//get multiple response
+			responseQuestion = responseQuestion
+				.split('/')
+				.map(n => n.trim());
+			// console.log('-->',responseQuestion);
+			seeQuestion(randQuestion, responseQuestion)
+		}
+		//remove dot in final str
+		function removeDot(line){
+			return line[line.length-1] === '.' 
+			? line.slice(0, line.indexOf(line[line.length-1])) //final text
+			: /* ;^;  */ line
+		}
+		//check response with value entered, with multiple response
+		function checkResponse(response, valueEntered){
+			return response.some((n) => n.toLowerCase() === valueEntered.toLowerCase());
+		}
+		//if checked is true, codelang alert!
+		function seeQuestion(phrase, response){
+			input({
+				type: 'text',
+				placeholder: 'Translate to portuguese here',
+				prefilledValue: ''
+			}, phrase, 'Submit', 'I don\'t no =(', function(valueEntered) {
+					if(checkResponse(response, valueEntered))
+						alert(1, 'Right! 👊 (• ͜ʖ•)', 2);
+					else
+						alert(3, '<b>' + response + '</b> =(', 2);
+		    }, function(valueEntered) {
+					alert(3, '<b>' + response + '</b>', 2);
+			});
+			ls2.save('codelangInterval', '{mykey:"codelangEven"}', minutesInterval * 60 * 1000);
+			// let checkVal = setInterval(myTimer, 200);
+		}
+
+		ls2.load('codelangInterval');
+
+		// Check Data
+		let isStarted = ls2.load('codelangInterval');	
+		let checkVal  = setInterval(myTimer, 200);
+		let i = 200;
+		function myTimer() {
+			i += 200;
+		  var result = ls2.load('codelangInterval');	
+			// console.log(i + ': ' + result);
+		  if(result === false) {
+		  	clearInterval(checkVal);
+		  	getRandomQuestion();
+		  }
+		}
+	}
+
+	let args = () => {
+		let request = new XMLHttpRequest();
+		let content = '';
+		request.open('GET', base_url+'/api/categories', true);
+		request.onload = function() {
+			if (request.status >= 200 && request.status < 400) {
+				content = JSON.parse(request.responseText).categories;
+				content = content.map( n  => {
+					return n
+					.slice(0, n.indexOf('.txt'))
+					.slice(0, n.indexOf('-pt'))
+					.slice(0, n.indexOf('-eng'))
+					.replace(/-/g, ' ');
+				})
+				//print
+				console.log(`1º arg: CATEGORIES: `);
+				content.map((n, i) => console.log(`${n}: `, i));
+				console.log(`2º arg: Time interval`);
+			}
+		};
+		request.send();
+	}
 	return {
-		input: input,
-		alert: alert,
-		confirm: confirm
+		start: codelangStart,
+		args: args
 	}
 }();
 
-// Node.js request --> IE9+  (╯°□°）╯
-let codelangStart = function(category, minutesInterval){
-	const base_url = 'http://localhost:8888';
 
-	let request = new XMLHttpRequest();
-	let phrases = {};
-	request.open('GET', base_url+'/api/eng/readphrases/?id='+category, true);
-	request.onload = function() {
-		if (request.status >= 200 && request.status < 400) {
-			phrases = JSON.parse(request.responseText).phrases;
-			console.log(phrases);
-		} else {
-		// We reached our target server, but it returned an error
-		}
-	};
-	request.onerror = function() {
-	// There was a connection error of some sort
-	};
-	request.send();
 
-	//User doing
-	var user = {
-		nivel: "1", 
-		timestamp: new Date().getTime(),
-		par: true
-	}
-	//Start application
-	let nowMinute = new Date().getMinutes();
-	let now = new Date().getTime();
-	if (get("codelang") == null ) {
-			codelang.alert(4, 'Welcome to the codelang! :D', 3);
-			put("codelang", JSON.stringify(user));
-			put("even", true);
-	}
+/*
+*
+* 	His was tested in IE (7-9), Firefox, Opera and Chrome:
+* 	Dynamic style
+*
+*/
+let css = `.notie-transition {
+	-moz-transition: all 0.3s ease;
+	-webkit-transition: all 0.3s ease;
+	transition: all 0.3s ease; }
 
-	function getRandomQuestion(){
-		var randOddNumber = 1;
-		var rand = Math.floor(Math.random() * phrases.length);
-		if(rand != 0)
-			randOddNumber = rand % 2 == 0 ? rand - 1 : rand; //need to be odd 
+	.notie-background-success {
+	  background-color: #57BF57; }
 
-		var randQuestion = phrases[randOddNumber].toLowerCase();
-			randQuestion = removeDot(randQuestion);
-		var responseQuestion = phrases[randOddNumber - 1].toLowerCase();
-			responseQuestion = removeDot(responseQuestion);
+	.notie-background-warning {
+	  background-color: #D6A14D; }
 
-		console.log(randQuestion, responseQuestion);
-		seeQuestion(randQuestion, responseQuestion)
-	}
-	function removeDot(line){
-		return line[line.length-1] === '.' 
-		? line.slice(0, line.indexOf(line[line.length-1])) //final text
-		: /* ;^;  */ line
-	}
-	function seeQuestion(phrase, response){
-		codelang.input({
-			type: 'text',
-			placeholder: 'Translate to portuguese here',
-			prefilledValue: ''
-		}, phrase, 'Submit', 'I don\'t no =(', function(valueEntered) {
-				if(valueEntered.toLowerCase() === response)
-					codelang.alert(1, 'Right! 👊 (• ͜ʖ•)', 2);
-				else
-					codelang.alert(3, '<b>' + response + '</b> =(', 2);
-	    }, function(valueEntered) {
-				codelang.alert(3, '<b>' + response + '</b>', 2);
-		});
-		ls2.save('codelangInterval', '{mykey:"codelangEven"}', minutesInterval * 60 * 1000);
-		// var checkVal = setInterval(myTimer, 200);
-	}
+	.notie-background-error {
+	  background-color: #E1715B; }
 
-	// Set Data
-	// ls2.save('codelangInterval', '{mykey:"codelangEven"}', minutesInterval * 60 * 1000);
-	ls2.load('codelangInterval');
+	.notie-background-info {
+	  background-color: #4D82D6; }
 
-	// Check Data
-	var isStarted = ls2.load('codelangInterval');	
-	var checkVal  = setInterval(myTimer, 200);
-	var i = 200;
-	function myTimer() {
-		i += 200;
-	  var result = ls2.load('codelangInterval');	
-		// console.log(i + ': ' + result);
-	  if(result === false) {
-	  	clearInterval(checkVal);
-	  	getRandomQuestion();
-	  }
-	}
+	#notie-alert-outer, #notie-confirm-outer, #notie-input-outer, #notie-select-outer {
+	  position: fixed;
+	  top: 0;
+	  left: 0;
+	  z-index: 999999999;
+	  height: auto;
+	  width: 100%;
+	  display: none;
+	  text-align: center;
+	  cursor: pointer;
+	  font-size: 24px;
+	  -o-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+	  -ms-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+	  -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+	  -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+	  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5); }
+	  @media (max-width: 600px) {
+	    #notie-alert-outer, #notie-confirm-outer, #notie-input-outer, #notie-select-outer {
+	      font-size: 18px; } }
+
+	#notie-alert-inner {
+	  padding: 20px;
+	  display: table-cell; }
+
+	#notie-alert-content {
+	  max-width: 900px;
+	  margin: 0 auto; }
+
+	#notie-alert-text {
+	  color: #FFFFFF; }
+
+	#notie-confirm-outer {
+	  cursor: default; }
+
+	#notie-confirm-inner, #notie-input-inner, #notie-select-inner {
+	  box-sizing: border-box;
+	  width: 100%;
+	  padding: 20px;
+	  display: block;
+	  cursor: default;
+	  background-color: #4D82D6; }
+
+	#notie-confirm-text {
+	  color: #FFFFFF; }
+
+	#notie-confirm-text-yes {
+	  color: #FFFFFF; }
+
+	#notie-confirm-text-no {
+	  color: #FFFFFF; }
+
+	#notie-confirm-yes, #notie-confirm-no, #notie-input-no, #notie-input-yes {
+	  float: left;
+	  height: 50px;
+	  line-height: 50px;
+	  width: 50%;
+	  cursor: pointer;
+	  background-color: #57BF57; }
+
+	#notie-confirm-no, #notie-input-no {
+	  float: right;
+	  background-color: #E1715B; }
+
+	#notie-confirm-background, #notie-input-background, #notie-select-background {
+	  position: fixed;
+	  top: 0;
+	  left: 0;
+	  z-index: 999999980;
+	  height: 100%;
+	  width: 100%;
+	  display: none;
+	  background-color: #FFFFFF;
+	  opacity: 0; }
+
+	/* INPUT */
+	#notie-input-outer {
+	  cursor: default; }
+
+	#notie-input-field {
+	  display: block;
+	  box-sizing: border-box;
+	  height: 55px;
+	  width: 100%;
+	  text-align: center;
+	  outline: 0;
+	  border: 0;
+	  background-color: #FFFFFF;
+	  font-family: inherit;
+	  font-size: 24px; }
+	  @media (max-width: 600px) {
+	    #notie-input-field {
+	      font-size: 18px; } }
+
+	#notie-input-text {
+	  color: #FFFFFF; }
+
+	#notie-input-text-yes {
+	  color: #FFFFFF; }
+
+	#notie-input-text-no {
+	  color: #FFFFFF; }
+
+	#notie-select-outer {
+	  top: auto;
+	  bottom: 0;
+	  cursor: default; }
+
+	#notie-select-text {
+	  color: #FFFFFF; }
+
+	#notie-select-choices, .notie-select-choice {
+	  background-color: #57BF57; }
+
+	.notie-select-choice {
+	  height: 50px;
+	  line-height: 50px;
+	  color: #FFFFFF;
+	  cursor: pointer; }
+
+	#notie-select-cancel {
+	  height: 60px;
+	  line-height: 60px;
+	  color: #FFFFFF;
+	  cursor: pointer;
+	  background-color: #A0A0A0; }}`,
+    head = document.head || document.getElementsByTagName('head')[0],
+    style = document.createElement('style');
+
+style.type = 'text/css';
+if (style.styleSheet){
+  style.styleSheet.cssText = css;
+} else {
+  style.appendChild(document.createTextNode(css));
 }
-codelangStart(0, 2);
+
+head.appendChild(style);

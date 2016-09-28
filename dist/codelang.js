@@ -1,5 +1,6 @@
 "use strict";
 
+var base_url = 'http://localhost:8888';
 //LocalStorage
 var get = function get(key) {
 	return window.localStorage ? window.localStorage[key] : null;
@@ -157,7 +158,6 @@ var codelang = function () {
 	}
 
 	function alertHide(callback) {
-
 		alertOuter.style.top = '-' + alertOuter.offsetHeight - 5 + 'px';
 		setTimeout(function () {
 			removeClass(alertOuter, 'notie-transition');
@@ -326,10 +326,7 @@ var codelang = function () {
 			inputIsShowing = false;
 		}, options.animationDelay + 10);
 	}
-	/** Select **/
-	// confirm
-	// **************
-
+	// Select
 	var confirmOuter = document.createElement('div');
 	confirmOuter.id = 'notie-confirm-outer';
 
@@ -514,95 +511,147 @@ var codelang = function () {
 			}
 		}
 	});
+
+	//Start application with args (category, interval)
+	var codelangStart = function codelangStart() {
+		var category = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+		var minutesInterval = arguments.length <= 1 || arguments[1] === undefined ? 15 : arguments[1];
+
+		var request = new XMLHttpRequest();
+		var phrases = {};
+		request.open('GET', base_url + '/api/eng/readphrases/?id=' + category, true);
+		request.onload = function () {
+			if (request.status >= 200 && request.status < 400) {
+				phrases = JSON.parse(request.responseText).phrases;
+				// console.log(phrases);
+			} else {
+				// We reached our target server, but it returned an error
+				console.log("error in server");
+			}
+		};
+		request.onerror = function () {
+			// There was a connection error of some sort
+		};
+		request.send();
+
+		//User doing
+		var user = {
+			nivel: "1",
+			timestamp: new Date().getTime(),
+			par: true
+		};
+
+		//Start time
+		var nowMinute = new Date().getMinutes();
+		var now = new Date().getTime();
+		//Welcome user
+		if (get("codelang") == null) {
+			alert(4, 'Welcome to the codelang! :D', 3);
+			put("codelang", JSON.stringify(user));
+			put("even", true);
+		}
+		function getRandomQuestion() {
+			var randOddNumber = 1;
+			var rand = Math.floor(Math.random() * phrases.length);
+			if (rand != 0) randOddNumber = rand % 2 == 0 ? rand - 1 : rand; //need to be odd 
+
+			var randQuestion = phrases[randOddNumber].toLowerCase();
+			randQuestion = removeDot(randQuestion);
+			var responseQuestion = phrases[randOddNumber - 1].toLowerCase();
+			responseQuestion = removeDot(responseQuestion);
+
+			// console.log(randQuestion, responseQuestion);
+			//get multiple response
+			responseQuestion = responseQuestion.split('/').map(function (n) {
+				return n.trim();
+			});
+			// console.log('-->',responseQuestion);
+			seeQuestion(randQuestion, responseQuestion);
+		}
+		//remove dot in final str
+		function removeDot(line) {
+			return line[line.length - 1] === '.' ? line.slice(0, line.indexOf(line[line.length - 1])) //final text
+			: /* ;^;  */line;
+		}
+		//check response with value entered, with multiple response
+		function checkResponse(response, valueEntered) {
+			return response.some(function (n) {
+				return n.toLowerCase() === valueEntered.toLowerCase();
+			});
+		}
+		//if checked is true, codelang alert!
+		function seeQuestion(phrase, response) {
+			input({
+				type: 'text',
+				placeholder: 'Translate to portuguese here',
+				prefilledValue: ''
+			}, phrase, 'Submit', 'I don\'t no =(', function (valueEntered) {
+				if (checkResponse(response, valueEntered)) alert(1, 'Right! 👊 (• ͜ʖ•)', 2);else alert(3, '<b>' + response + '</b> =(', 2);
+			}, function (valueEntered) {
+				alert(3, '<b>' + response + '</b>', 2);
+			});
+			ls2.save('codelangInterval', '{mykey:"codelangEven"}', minutesInterval * 60 * 1000);
+			// let checkVal = setInterval(myTimer, 200);
+		}
+
+		ls2.load('codelangInterval');
+
+		// Check Data
+		var isStarted = ls2.load('codelangInterval');
+		var checkVal = setInterval(myTimer, 200);
+		var i = 200;
+		function myTimer() {
+			i += 200;
+			var result = ls2.load('codelangInterval');
+			// console.log(i + ': ' + result);
+			if (result === false) {
+				clearInterval(checkVal);
+				getRandomQuestion();
+			}
+		}
+	};
+
+	var args = function args() {
+		var request = new XMLHttpRequest();
+		var content = '';
+		request.open('GET', base_url + '/api/categories', true);
+		request.onload = function () {
+			if (request.status >= 200 && request.status < 400) {
+				content = JSON.parse(request.responseText).categories;
+				content = content.map(function (n) {
+					return n.slice(0, n.indexOf('.txt')).slice(0, n.indexOf('-pt')).slice(0, n.indexOf('-eng')).replace(/-/g, ' ');
+				});
+				//print
+				console.log("1º arg: CATEGORIES: ");
+				content.map(function (n, i) {
+					return console.log(n + ": ", i);
+				});
+				console.log("2º arg: Time interval");
+			}
+		};
+		request.send();
+	};
 	return {
-		input: input,
-		alert: alert,
-		confirm: confirm
+		start: codelangStart,
+		args: args
 	};
 }();
 
-// Node.js request --> IE9+  (╯°□°）╯
-var codelangStart = function codelangStart(category, minutesInterval) {
-	var base_url = 'http://localhost:8888';
+/*
+*
+* 	His was tested in IE (7-9), Firefox, Opera and Chrome:
+* 	Dynamic style
+*
+*/
+var css = ".notie-transition {\n\t-moz-transition: all 0.3s ease;\n\t-webkit-transition: all 0.3s ease;\n\ttransition: all 0.3s ease; }\n\n\t.notie-background-success {\n\t  background-color: #57BF57; }\n\n\t.notie-background-warning {\n\t  background-color: #D6A14D; }\n\n\t.notie-background-error {\n\t  background-color: #E1715B; }\n\n\t.notie-background-info {\n\t  background-color: #4D82D6; }\n\n\t#notie-alert-outer, #notie-confirm-outer, #notie-input-outer, #notie-select-outer {\n\t  position: fixed;\n\t  top: 0;\n\t  left: 0;\n\t  z-index: 999999999;\n\t  height: auto;\n\t  width: 100%;\n\t  display: none;\n\t  text-align: center;\n\t  cursor: pointer;\n\t  font-size: 24px;\n\t  -o-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);\n\t  -ms-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);\n\t  -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);\n\t  -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);\n\t  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5); }\n\t  @media (max-width: 600px) {\n\t    #notie-alert-outer, #notie-confirm-outer, #notie-input-outer, #notie-select-outer {\n\t      font-size: 18px; } }\n\n\t#notie-alert-inner {\n\t  padding: 20px;\n\t  display: table-cell; }\n\n\t#notie-alert-content {\n\t  max-width: 900px;\n\t  margin: 0 auto; }\n\n\t#notie-alert-text {\n\t  color: #FFFFFF; }\n\n\t#notie-confirm-outer {\n\t  cursor: default; }\n\n\t#notie-confirm-inner, #notie-input-inner, #notie-select-inner {\n\t  box-sizing: border-box;\n\t  width: 100%;\n\t  padding: 20px;\n\t  display: block;\n\t  cursor: default;\n\t  background-color: #4D82D6; }\n\n\t#notie-confirm-text {\n\t  color: #FFFFFF; }\n\n\t#notie-confirm-text-yes {\n\t  color: #FFFFFF; }\n\n\t#notie-confirm-text-no {\n\t  color: #FFFFFF; }\n\n\t#notie-confirm-yes, #notie-confirm-no, #notie-input-no, #notie-input-yes {\n\t  float: left;\n\t  height: 50px;\n\t  line-height: 50px;\n\t  width: 50%;\n\t  cursor: pointer;\n\t  background-color: #57BF57; }\n\n\t#notie-confirm-no, #notie-input-no {\n\t  float: right;\n\t  background-color: #E1715B; }\n\n\t#notie-confirm-background, #notie-input-background, #notie-select-background {\n\t  position: fixed;\n\t  top: 0;\n\t  left: 0;\n\t  z-index: 999999980;\n\t  height: 100%;\n\t  width: 100%;\n\t  display: none;\n\t  background-color: #FFFFFF;\n\t  opacity: 0; }\n\n\t/* INPUT */\n\t#notie-input-outer {\n\t  cursor: default; }\n\n\t#notie-input-field {\n\t  display: block;\n\t  box-sizing: border-box;\n\t  height: 55px;\n\t  width: 100%;\n\t  text-align: center;\n\t  outline: 0;\n\t  border: 0;\n\t  background-color: #FFFFFF;\n\t  font-family: inherit;\n\t  font-size: 24px; }\n\t  @media (max-width: 600px) {\n\t    #notie-input-field {\n\t      font-size: 18px; } }\n\n\t#notie-input-text {\n\t  color: #FFFFFF; }\n\n\t#notie-input-text-yes {\n\t  color: #FFFFFF; }\n\n\t#notie-input-text-no {\n\t  color: #FFFFFF; }\n\n\t#notie-select-outer {\n\t  top: auto;\n\t  bottom: 0;\n\t  cursor: default; }\n\n\t#notie-select-text {\n\t  color: #FFFFFF; }\n\n\t#notie-select-choices, .notie-select-choice {\n\t  background-color: #57BF57; }\n\n\t.notie-select-choice {\n\t  height: 50px;\n\t  line-height: 50px;\n\t  color: #FFFFFF;\n\t  cursor: pointer; }\n\n\t#notie-select-cancel {\n\t  height: 60px;\n\t  line-height: 60px;\n\t  color: #FFFFFF;\n\t  cursor: pointer;\n\t  background-color: #A0A0A0; }}",
+    head = document.head || document.getElementsByTagName('head')[0],
+    style = document.createElement('style');
 
-	var request = new XMLHttpRequest();
-	var phrases = {};
-	request.open('GET', base_url + '/api/eng/readphrases/?id=' + category, true);
-	request.onload = function () {
-		if (request.status >= 200 && request.status < 400) {
-			phrases = JSON.parse(request.responseText).phrases;
-			console.log(phrases);
-		} else {
-			// We reached our target server, but it returned an error
-		}
-	};
-	request.onerror = function () {
-		// There was a connection error of some sort
-	};
-	request.send();
+style.type = 'text/css';
+if (style.styleSheet) {
+	style.styleSheet.cssText = css;
+} else {
+	style.appendChild(document.createTextNode(css));
+}
 
-	//User doing
-	var user = {
-		nivel: "1",
-		timestamp: new Date().getTime(),
-		par: true
-	};
-	//Start application
-	var nowMinute = new Date().getMinutes();
-	var now = new Date().getTime();
-	if (get("codelang") == null) {
-		codelang.alert(4, 'Welcome to the codelang! :D', 3);
-		put("codelang", JSON.stringify(user));
-		put("even", true);
-	}
-
-	function getRandomQuestion() {
-		var randOddNumber = 1;
-		var rand = Math.floor(Math.random() * phrases.length);
-		if (rand != 0) randOddNumber = rand % 2 == 0 ? rand - 1 : rand; //need to be odd 
-
-		var randQuestion = phrases[randOddNumber].toLowerCase();
-		randQuestion = removeDot(randQuestion);
-		var responseQuestion = phrases[randOddNumber - 1].toLowerCase();
-		responseQuestion = removeDot(responseQuestion);
-
-		console.log(randQuestion, responseQuestion);
-		seeQuestion(randQuestion, responseQuestion);
-	}
-	function removeDot(line) {
-		return line[line.length - 1] === '.' ? line.slice(0, line.indexOf(line[line.length - 1])) //final text
-		: /* ;^;  */line;
-	}
-	function seeQuestion(phrase, response) {
-		codelang.input({
-			type: 'text',
-			placeholder: 'Translate to portuguese here',
-			prefilledValue: ''
-		}, phrase, 'Submit', 'I don\'t no =(', function (valueEntered) {
-			if (valueEntered.toLowerCase() === response) codelang.alert(1, 'Right! 👊 (• ͜ʖ•)', 2);else codelang.alert(3, '<b>' + response + '</b> =(', 2);
-		}, function (valueEntered) {
-			codelang.alert(3, '<b>' + response + '</b>', 2);
-		});
-		ls2.save('codelangInterval', '{mykey:"codelangEven"}', minutesInterval * 60 * 1000);
-		// var checkVal = setInterval(myTimer, 200);
-	}
-
-	// Set Data
-	// ls2.save('codelangInterval', '{mykey:"codelangEven"}', minutesInterval * 60 * 1000);
-	ls2.load('codelangInterval');
-
-	// Check Data
-	var isStarted = ls2.load('codelangInterval');
-	var checkVal = setInterval(myTimer, 200);
-	var i = 200;
-	function myTimer() {
-		i += 200;
-		var result = ls2.load('codelangInterval');
-		// console.log(i + ': ' + result);
-		if (result === false) {
-			clearInterval(checkVal);
-			getRandomQuestion();
-		}
-	}
-};
-codelangStart(0, 2);
+head.appendChild(style);

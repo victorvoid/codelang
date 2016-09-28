@@ -194,7 +194,7 @@ Eu pagarei.
 I'll pay.	
 
 
-Eu levo/Eu fico (com alguma coisa)
+Eu levo/Eu fico
 I'll take it.	
 
 
@@ -298,7 +298,7 @@ Só um momento.
 Just a moment.	
 
 
-Deixa-me ver/checar.
+Deixa-me ver/Deixa-me checar.
 Let me check.	
 
 
@@ -330,7 +330,7 @@ Da próxima vez.
 Next time.	
 
 
-Não, obrigado/a.
+Não, obrigado/Não, obrigada.
 No, thank you.	
 
 
@@ -422,27 +422,27 @@ Diga-me.
 Tell me.	
 
 
-Obrigado/a senhorita.
+Obrigado senhorita/Obrigada senhorita.
 Thank you miss.	
 
 
-Obrigado/a senhor.
+Obrigado senhor/Obrigada senhor.
 Thank you sir.	
 
 
-Muito obrigado/a.
+Muito obrigado/Muito obrigada.
 Thank you very much.	
 
 
-Obrigado/a.
+Obrigado/Obrigada.
 Thank you.	
 
 
-Obrigado/a por tudo.
+Obrigado por tudo/Obrigada por tudo.
 Thanks for everything.	
 
 
-Obrigado/a pela tua ajuda
+Obrigado pela tua ajuda/ Obrigada pela tua ajuda
 Thanks for your help.	
 
 
@@ -519,7 +519,7 @@ Prove.
 Try it.	
 
 
-Muito bem, obrigado/a.
+Muito bem, obrigado/Muito bem, obrigada.
 Very good, thanks.	
 
 
@@ -539,11 +539,11 @@ Tuas coisas estão todas aqui.
 Your things are all here.	
 
 
-Você é bonito/a
+Você é bonito/Você é bonita
 You're beautiful.	
 
 
-Você é muito gentil/legal.
+Você é muito gentil/Você é muito legal.
 You're very nice.	
 
 

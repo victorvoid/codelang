@@ -13,9 +13,14 @@
     "url": "git+https://github.com/victorvoid/codelang.git"
   },
   "keywords": [
-    "gulp",
+    "english practice",
+    "english",
+    "praticar inglês",
+    "portuguese",
     "codelang",
-    "languages"
+    "languages",
+    "victorvoid",
+    "Victor Igor"
   ],
   "author": "Victor Igor",
   "license": "MIT",
@@ -24,9 +29,9 @@
   },
   "homepage": "https://github.com/victorvoid/codelang#readme",
   "dependencies": {
-    "babel-runtime": "^6.6.1"
   },
   "devDependencies": {
+    "babel-runtime": "^6.6.1",
     "babel-cli": "^6.6.5",
     "babel-core": "^6.7.2",
     "babel-eslint": "^6.0.2",
