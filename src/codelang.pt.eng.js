@@ -578,7 +578,7 @@ let codelang = function() {
 				type: 'text',
 				placeholder: 'Translate to portuguese here',
 				prefilledValue: ''
-			}, phrase, 'Submit', 'I don\'t no =(', function(valueEntered) {
+			}, phrase, 'Submit', 'I don\'t know =(', function(valueEntered) {
 					if(checkResponse(response, valueEntered))
 						alert(1, 'Right! 👊 (• ͜ʖ•)', 2);
 					else
