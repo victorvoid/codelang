@@ -2,6 +2,8 @@
 
 [![NPM version][npm-image]][npm-url] 
 
+[![Npm Downloads](https://nodei.co/npm/codelang.png?downloads=true&stars=true)](https://nodei.co/npm/codelang.png?downloads=true&stars=true)
+
 [npm-image]: https://badge.fury.io/js/codelang.svg
 [npm-url]: https://npmjs.org/package/codelang
 
