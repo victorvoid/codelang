@@ -1,28 +1,49 @@
 const base_url = 'http://localhost:8888';
+
 //LocalStorage
+
 let get = function (key) {
   return window.localStorage ? window.localStorage[key] : null;
 }
+
 let put = function (key, value) {
   if (window.localStorage) {
     window.localStorage[key] = value;
   }
 }
+
 let ls2 = {
 	save : function(key, jsonData, expirationMS){
-		if (typeof (Storage) == "undefined") { return false; }
-		//var expirationMS = expirationMin * 60 * 1000;
-		var record = {value: JSON.stringify(jsonData), timestamp: new Date().getTime() + expirationMS}
+		if ( typeof (Storage) === "undefined" ) {
+			return false; 
+		}
+
+		//let expirationMS = expirationMin * 60 * 1000;
+		let record = {
+			value: JSON.stringify(jsonData),
+			timestamp: new Date().getTime() + expirationMS
+		};
+
 		localStorage.setItem(key, JSON.stringify(record));
+
 		return jsonData;
 	},
+
 	load : function(key){
-		if (typeof (Storage) == "undefined") { return false; }
+		if ( typeof (Storage) === "undefined" ) { 
+			return false; 
+		}
+
 		var record = JSON.parse(localStorage.getItem(key));
-		if (!record){return false;}
-		return (new Date().getTime() < record.timestamp && JSON.parse(record.value));
+
+		if ( !record ){
+			return false;
+		}
+
+		return ( new Date().getTime() < record.timestamp && JSON.parse(record.value) );
 	}
 }
+
 function addMinutes(date, minutes) {
     return new Date(date.getTime() + minutes*60000);
 }
@@ -46,9 +67,9 @@ let codelang = function() {
 	}
 
 	/** Alert **/
-	var wasClickedCounter = 0
-	// create alert container
-	let alertOuter = document.createElement('div');
+	var wasClickedCounter = 0,
+	  alertOuter = document.createElement('div'); // create alert container
+	
 	alertOuter.id = 'notie-alert-outer';
 	
 	// Hide alert on click
@@ -82,34 +103,42 @@ let codelang = function() {
 	let alertTimeout2;
 	
 	function alert(type, message, seconds) {
-		if (options.colorText.length > 0) alertText.style.color = options.colorText;	
+		if ( options.colorText.length > 0 ) {
+			alertText.style.color = options.colorText;	
+		}
+
 		blur();
+
     	wasClickedCounter++;
 		setTimeout(function() {
 			wasClickedCounter--;
 		}, (options.animationDelay + 10));
 		
 		if (wasClickedCounter === 1) {
+
 			if (alertIsShowing) {
 				clearTimeout(alertTimeout1);
 				clearTimeout(alertTimeout2);
 				alertHide(function() {
 					alertShow(type, message, seconds);
 				});
+
 			}else {
 				alertShow(type, message, seconds);
 			}
+
 		}
 	}
 	function alertShow(type, message, seconds) {
 		alertIsShowing = true;
 		let duration = 0;
-		if (typeof seconds === 'undefined' || seconds === 0) {
+		if ( typeof seconds === 'undefined' || seconds === 0 ) {
 			let duration = 86400000;
-		}
-		else if (seconds > 0 && seconds < 1) {
-			duration = 1000;
-		}
+		} 
+		else 
+			if ( seconds > 0 && seconds < 1 ) {
+				duration = 1000;
+			}
 		else {
 			duration = seconds * 1000;
 		}
@@ -123,20 +152,32 @@ let codelang = function() {
 		// Set notie type (background color)
 		switch(type) {
 			case 1:
-				if (options.colorSuccess.length > 0) alertOuter.style.backgroundColor = options.colorSuccess;
-				else addClass(alertOuter, 'notie-background-success');
+				if ( options.colorSuccess.length > 0 ){
+					alertOuter.style.backgroundColor = options.colorSuccess;
+				} else { 
+					addClass(alertOuter, 'notie-background-success');
+				}
 				break;
 			case 2:
-				if (options.colorWarning.length > 0) alertOuter.style.backgroundColor = options.colorWarning;
-				else addClass(alertOuter, 'notie-background-warning');
+				if ( options.colorWarning.length > 0 ) {
+					alertOuter.style.backgroundColor = options.colorWarning;
+				} else { 
+					addClass(alertOuter, 'notie-background-warning');
+				}
 				break;
 			case 3:
-				if (options.colorError.length > 0) alertOuter.style.backgroundColor = options.colorError;
-				else addClass(alertOuter, 'notie-background-error');
+				if ( options.colorError.length > 0 ){
+					alertOuter.style.backgroundColor = options.colorError;
+				} else {
+					addClass(alertOuter, 'notie-background-error');
+				}
 				break;
 			case 4:
-				if (options.colorInfo.length > 0) alertOuter.style.backgroundColor = options.colorInfo;
-				else addClass(alertOuter, 'notie-background-info');
+				if ( options.colorInfo.length > 0 ){
+					alertOuter.style.backgroundColor = options.colorInfo;
+				} else {
+					addClass(alertOuter, 'notie-background-info');
+				}
 				break;
 		}
 		// Set notie text
@@ -144,6 +185,7 @@ let codelang = function() {
 		alertOuter.style.top = '-10000px';
 		alertOuter.style.display = 'table';
 		alertOuter.style.top = '-' + alertOuter.offsetHeight - 5 + 'px';
+
 		alertTimeout1 = setTimeout(function() {
 			addClass(alertOuter, 'notie-transition');
 				alertOuter.style.top = 0;
@@ -158,11 +200,16 @@ let codelang = function() {
 	function alertHide(callback) {
 		alertOuter.style.top = '-' + alertOuter.offsetHeight - 5 + 'px';
 		setTimeout(function() {
+
 			removeClass(alertOuter, 'notie-transition');
 			alertOuter.style.top = '-10000px';
 			alertIsShowing = false;
-			if (callback) { callback();}
-		}, (options.animationDelay + 10));
+
+			if ( callback ) {
+				callback();
+			}
+
+		}, ( options.animationDelay + 10 ));
 	}
 
 	let inputOuter = document.createElement('div');
@@ -210,7 +257,7 @@ let codelang = function() {
 		
 	// Hide input on no click and background click
 	inputBackground.onclick = function() {
-	    if (options.backgroundClickDismiss) {
+	    if ( options.backgroundClickDismiss ) {
 	        inputHide();
 	    }
 	};
@@ -228,32 +275,33 @@ let codelang = function() {
 			inputTextNo.style.color = options.colorText;
 		}
 		blur();
-		if (typeof settings.type !== 'undefined' && settings.type) {
+		if ( typeof settings.type !== 'undefined' && settings.type ) {
 			inputField.setAttribute('type', settings.type);
-		}else {
+		} else {
 			inputField.setAttribute('type', 'text');
 		}
-		if (typeof settings.placeholder !== 'undefined' && settings.placeholder) {
+		if ( typeof settings.placeholder !== 'undefined' && settings.placeholder ) {
 			inputField.setAttribute('placeholder', settings.placeholder);
-		}else {
+		} else {
 			// Do not set placeholder
 		}
-	  if (typeof settings.prefilledValue !== 'undefined' && settings.prefilledValue) {
+	  if ( typeof settings.prefilledValue !== 'undefined' && settings.prefilledValue ) {
 			inputField.value = settings.prefilledValue;
-		}else {
+		} else {
 			inputField.value = '';
 		}
 
-	  if (alertIsShowing) {		
+	  if ( alertIsShowing ) {		
 	    // Hide alert
 	    clearTimeout(alertTimeout1);
 	    clearTimeout(alertTimeout2);
 	    alertHide(function() {
 	        inputShow(title, submitText, cancelText, submitCallback, cancelCallback);
 	    });	
-	  }else {
+	  } else {
 	    inputShow(title, submitText, cancelText, submitCallback, cancelCallback);
 	  }
+
 	}
 
 	function inputShow(title, submitText, cancelText, submitCallback, cancelCallback) {
@@ -293,19 +341,21 @@ let codelang = function() {
 				addClass(inputOuter, 'notie-transition');
 	      inputOuter.style.top = 0;
 	      inputBackground.style.opacity = '0.75';
+	      
 	      setTimeout(function() {
 		      inputIsShowing = true;
 					inputField.focus();
 	    	}, (options.animationDelay + 10));
+
 	    }, 20);
 		}
 
-		if (inputIsShowing) {
+		if ( inputIsShowing ) {
 		    inputHide();
 		    setTimeout(function() {
 		        inputShowInner();
 		    }, (options.animationDelay + 10));
-		}else {
+		} else {
 		    inputShowInner();
 		}
 	}
@@ -323,127 +373,138 @@ let codelang = function() {
 		}, (options.animationDelay + 10));
 	}
 // Select
-  var confirmOuter = document.createElement('div')
-  confirmOuter.id = 'notie-confirm-outer'
+  var confirmOuter = document.createElement('div');
+  confirmOuter.id = 'notie-confirm-outer';
 
-  var confirmInner = document.createElement('div')
-  confirmInner.id = 'notie-confirm-inner'
-  confirmOuter.appendChild(confirmInner)
+  var confirmInner = document.createElement('div');
+  confirmInner.id = 'notie-confirm-inner';
+  confirmOuter.appendChild(confirmInner);
 
-  var confirmText = document.createElement('span')
-  confirmText.id = 'notie-confirm-text'
-  confirmInner.appendChild(confirmText)
+  var confirmText = document.createElement('span');
+  confirmText.id = 'notie-confirm-text';
+  confirmInner.appendChild(confirmText);
 
-  var confirmYes = document.createElement('div')
-  confirmYes.id = 'notie-confirm-yes'
-  confirmOuter.appendChild(confirmYes)
+  var confirmYes = document.createElement('div');
+  confirmYes.id = 'notie-confirm-yes';
+  confirmOuter.appendChild(confirmYes);
 
-  var confirmNo = document.createElement('div')
-  confirmNo.id = 'notie-confirm-no'
-  confirmOuter.appendChild(confirmNo)
+  var confirmNo = document.createElement('div');
+  confirmNo.id = 'notie-confirm-no';
+  confirmOuter.appendChild(confirmNo);
 
-  var confirmTextYes = document.createElement('span')
-  confirmTextYes.id = 'notie-confirm-text-yes'
-  confirmYes.appendChild(confirmTextYes)
+  var confirmTextYes = document.createElement('span');
+  confirmTextYes.id = 'notie-confirm-text-yes';
+  confirmYes.appendChild(confirmTextYes);
 
-  var confirmTextNo = document.createElement('span')
-  confirmTextNo.id = 'notie-confirm-text-no'
-  confirmNo.appendChild(confirmTextNo)
+  var confirmTextNo = document.createElement('span');
+  confirmTextNo.id = 'notie-confirm-text-no';
+  confirmNo.appendChild(confirmTextNo);
 
-  var confirmBackground = document.createElement('div')
-  confirmBackground.id = 'notie-confirm-background'
-  addClass(confirmBackground, 'notie-transition')
+  var confirmBackground = document.createElement('div');
+  confirmBackground.id = 'notie-confirm-background';
+  addClass(confirmBackground, 'notie-transition');
 
   // Hide notie.confirm on no click and background click
   confirmBackground.onclick = function () {
     if (options.backgroundClickDismiss) {
-      confirmHide()
+      confirmHide();
     }
   }
 
   // Attach confirm elements to the body element
-  document.body.appendChild(confirmOuter)
-  document.body.appendChild(confirmBackground)
+  document.body.appendChild(confirmOuter);
+  document.body.appendChild(confirmBackground);
 
 	// confirm helper variables
-  var confirmIsShowing = false
+  var confirmIsShowing = false;
 
   function confirm (title, yesText, noText, yesCallback, noCallback) {
-    if (options.colorInfo.length > 0) confirmInner.style.backgroundColor = options.colorInfo
-    if (options.colorSuccess.length > 0) confirmYes.style.backgroundColor = options.colorSuccess
-    if (options.colorError.length > 0) confirmNo.style.backgroundColor = options.colorError
-    if (options.colorText.length > 0) {
-      confirmText.style.color = options.colorText
-      confirmTextYes.style.color = options.colorText
-      confirmTextNo.style.color = options.colorText
+    if ( options.colorInfo.length > 0 ){
+    	confirmInner.style.backgroundColor = options.colorInf;
+    }
+
+    if ( options.colorSuccess.length > 0 ){
+    	confirmYes.style.backgroundColor = options.colorSuccess;
+    }
+
+    if ( options.colorError.length > 0 ){
+    	confirmNo.style.backgroundColor = options.colorError;
+    }
+
+    if ( options.colorText.length > 0 ) {
+      confirmText.style.color = options.colorText;
+      confirmTextYes.style.color = options.colorText;
+      confirmTextNo.style.color = options.colorText;
     }
 
     blur()
 
-    if (alertIsShowing) {
+    if ( alertIsShowing ) {
     // Hide notie.alert
       alertHide(function () {
-        confirmShow(title, yesText, noText, yesCallback, noCallback)
-      })
+        confirmShow(title, yesText, noText, yesCallback, noCallback);
+      });
     } else {
-      confirmShow(title, yesText, noText, yesCallback, noCallback)
+      confirmShow(title, yesText, noText, yesCallback, noCallback);
     }
   }
 
   function confirmShow (title, yesText, noText, yesCallback, noCallback) {
-    scrollDisable()
+    scrollDisable();
 
     // Yes callback function
     confirmYes.onclick = function () {
-      confirmHide()
-      if (yesCallback) {
+      confirmHide();
+      if ( yesCallback ) {
         setTimeout(function () {
           yesCallback()
-        }, (options.animationDelay + 10))
+        }, (options.animationDelay + 10));
       }
     }
 
     // No callback function
     confirmNo.onclick = function () {
-      confirmHide()
-      if (noCallback) {
+      confirmHide();
+      if ( noCallback ) {
         setTimeout(function () {
           noCallback()
-        }, (options.animationDelay + 10))
+        }, (options.animationDelay + 10));
       }
     }
 
     function confirmShowInner () {
       // Set confirm text
-      confirmText.innerHTML = title
-      confirmTextYes.innerHTML = yesText
-      confirmTextNo.innerHTML = noText
+      confirmText.innerHTML = title;
+      confirmTextYes.innerHTML = yesText;
+      confirmTextNo.innerHTML = noText;
 
       // Get confirm's height
-      confirmOuter.style.top = '-10000px'
-      confirmOuter.style.display = 'table'
-      confirmOuter.style.top = '-' + confirmOuter.offsetHeight - 5 + 'px'
-      confirmBackground.style.display = 'block'
+      confirmOuter.style.top = '-10000px';
+      confirmOuter.style.display = 'table';
+      confirmOuter.style.top = '-' + confirmOuter.offsetHeight - 5 + 'px';
+      confirmBackground.style.display = 'block';
 
       setTimeout(function () {
-        addClass(confirmOuter, 'notie-transition')
+        addClass(confirmOuter, 'notie-transition');
 
-        confirmOuter.style.top = 0
-        confirmBackground.style.opacity = '0.75'
+        confirmOuter.style.top = 0;
+        confirmBackground.style.opacity = '0.75';
 
         setTimeout(function () {
-          confirmIsShowing = true
-        }, (options.animationDelay + 10))
-      }, 20)
+          confirmIsShowing = true;
+        }, (options.animationDelay + 10));
+
+      }, 20);
+
     }
 
-    if (confirmIsShowing) {
-      confirmHide()
+    if ( confirmIsShowing ) {
+      confirmHide();
       setTimeout(function () {
-        confirmShowInner()
+        confirmShowInner();
       }, (options.animationDelay + 10))
     } else {
-      confirmShowInner()
+      confirmShowInner();
     }
   }
 
@@ -452,28 +513,29 @@ let codelang = function() {
     confirmBackground.style.opacity = '0'
 
     setTimeout(function () {
-      removeClass(confirmOuter, 'notie-transition')
-      confirmOuter.style.top = '-10000px'
-      confirmBackground.style.display = 'none'
+      removeClass(confirmOuter, 'notie-transition');
+      confirmOuter.style.top = '-10000px';
+      confirmBackground.style.display = 'none';
 
-      scrollEnable()
+      scrollEnable();
 
-      confirmIsShowing = false
-    }, (options.animationDelay + 10))
+      confirmIsShowing = false;
+    }, (options.animationDelay + 10));
+
   }
 	// Internal helper functions
 	function addClass(element, className) {
-		if (element.classList) {
+		if ( element.classList ) {
 			element.classList.add(className);
-		}else {
+		} else {
 			element.className += ' ' + className;
 		}
 	}
+
 	function removeClass(element, className) {
-		if (element.classList) {
+		if ( element.classList ) {
 			element.classList.remove(className);
-		}
-		else {
+		} else {
 			element.className = element.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
 		}
 	}
@@ -481,29 +543,34 @@ let codelang = function() {
 	function blur() {
 		document.activeElement.blur();
 	}
-	let originalBodyHeight, originalBodyOverflow;
+
+	let originalBodyHeight,
+	  originalBodyOverflow;
+
   function scrollDisable() {
       originalBodyHeight = document.body.style.height;
       originalBodyOverflow = document.body.style.overflow;
       document.body.style.height = '100%';
       document.body.style.overflow = 'hidden';
   }
+
   function scrollEnable() {
       document.body.style.height = originalBodyHeight;
       document.body.style.overflow = originalBodyOverflow;
   }
+
   window.addEventListener('keydown', function (event) {
-    var enterClicked = (event.which === 13 || event.keyCode === 13)
-    var escapeClicked = (event.which === 27 || event.keyCode === 27)
-    if (alertIsShowing) {
-      if (enterClicked || escapeClicked) {
-        alertHide()
+    var enterClicked = ( event.which === 13 || event.keyCode === 13 )
+    var escapeClicked = ( event.which === 27 || event.keyCode === 27 )
+    if ( alertIsShowing ) {
+      if ( enterClicked || escapeClicked ) {
+        alertHide();
       }
-    } else if (inputIsShowing) {
+    } else if ( inputIsShowing ) {
       if (enterClicked) {
-        inputYes.click()
-      } else if (escapeClicked) {
-        inputHide()
+        inputYes.click();
+      } else if ( escapeClicked ) {
+        inputHide();
       }
     } 
   });
@@ -538,20 +605,25 @@ let codelang = function() {
 		let nowMinute = new Date().getMinutes();
 		let now = new Date().getTime();
 		//Welcome user
-		if (get("codelang") == null ) {
+		if ( get("codelang") == null ) {
 				alert(4, 'Welcome to the codelang! :D', 3);
 				put("codelang", JSON.stringify(user));
 				put("even", true);
 		}
+
 		function getRandomQuestion(){
-			let randOddNumber = 1;
+			let randOddNumber = 1,
+			  randQuestion,
+			  responseQuestion;
+
 			let rand = Math.floor(Math.random() * phrases.length);
-			if(rand != 0)
+			if( rand != 0 )
 				randOddNumber = rand % 2 == 0 ? rand - 1 : rand; //need to be odd 
 
-			let randQuestion = phrases[randOddNumber].toLowerCase();
+				randQuestion = phrases[randOddNumber].toLowerCase();
 				randQuestion = removeDot(randQuestion);
-			let responseQuestion = phrases[randOddNumber - 1].toLowerCase();
+
+				responseQuestion = phrases[randOddNumber - 1].toLowerCase();
 				responseQuestion = removeDot(responseQuestion);
 
 			// console.log(randQuestion, responseQuestion);
@@ -562,16 +634,19 @@ let codelang = function() {
 			// console.log('-->',responseQuestion);
 			seeQuestion(randQuestion, responseQuestion)
 		}
+
 		//remove dot in final str
 		function removeDot(line){
 			return line[line.length-1] === '.' 
 			? line.slice(0, line.indexOf(line[line.length-1])) //final text
 			: /* ;^;  */ line
 		}
+
 		//check response with value entered, with multiple response
 		function checkResponse(response, valueEntered){
 			return response.some((n) => n.toLowerCase() === valueEntered.toLowerCase());
 		}
+
 		//if checked is true, codelang alert!
 		function seeQuestion(phrase, response){
 			input({
@@ -579,10 +654,11 @@ let codelang = function() {
 				placeholder: 'Translate to portuguese here',
 				prefilledValue: ''
 			}, phrase, 'Submit', 'I don\'t know =(', function(valueEntered) {
-					if(checkResponse(response, valueEntered))
+					if(checkResponse(response, valueEntered)){
 						alert(1, 'Right! 👊 (• ͜ʖ•)', 2);
-					else
+					} else{
 						alert(3, '<b>' + response + '</b> =(', 2);
+					}
 		    }, function(valueEntered) {
 					alert(3, '<b>' + response + '</b>', 2);
 			});
@@ -600,7 +676,7 @@ let codelang = function() {
 			i += 200;
 		  var result = ls2.load('codelangInterval');	
 			// console.log(i + ': ' + result);
-		  if(result === false) {
+		  if( result === false ) {
 		  	clearInterval(checkVal);
 		  	getRandomQuestion();
 		  }
@@ -612,7 +688,7 @@ let codelang = function() {
 		let content = '';
 		request.open('GET', base_url+'/api/categories', true);
 		request.onload = function() {
-			if (request.status >= 200 && request.status < 400) {
+			if ( request.status >= 200 && request.status < 400 ) {
 				content = JSON.parse(request.responseText).categories;
 				content = content.map( n  => {
 					return n
@@ -789,7 +865,7 @@ let css = `.notie-transition {
     style = document.createElement('style');
 
 style.type = 'text/css';
-if (style.styleSheet){
+if ( style.styleSheet ){
   style.styleSheet.cssText = css;
 } else {
   style.appendChild(document.createTextNode(css));

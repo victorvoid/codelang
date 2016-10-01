@@ -1,36 +1,51 @@
 "use strict";
 
 var base_url = 'http://localhost:8888';
+
 //LocalStorage
+
 var get = function get(key) {
 	return window.localStorage ? window.localStorage[key] : null;
 };
+
 var put = function put(key, value) {
 	if (window.localStorage) {
 		window.localStorage[key] = value;
 	}
 };
+
 var ls2 = {
 	save: function save(key, jsonData, expirationMS) {
-		if (typeof Storage == "undefined") {
+		if (typeof Storage === "undefined") {
 			return false;
 		}
-		//var expirationMS = expirationMin * 60 * 1000;
-		var record = { value: JSON.stringify(jsonData), timestamp: new Date().getTime() + expirationMS };
+
+		//let expirationMS = expirationMin * 60 * 1000;
+		var record = {
+			value: JSON.stringify(jsonData),
+			timestamp: new Date().getTime() + expirationMS
+		};
+
 		localStorage.setItem(key, JSON.stringify(record));
+
 		return jsonData;
 	},
+
 	load: function load(key) {
-		if (typeof Storage == "undefined") {
+		if (typeof Storage === "undefined") {
 			return false;
 		}
+
 		var record = JSON.parse(localStorage.getItem(key));
+
 		if (!record) {
 			return false;
 		}
+
 		return new Date().getTime() < record.timestamp && JSON.parse(record.value);
 	}
 };
+
 function addMinutes(date, minutes) {
 	return new Date(date.getTime() + minutes * 60000);
 }
@@ -54,9 +69,9 @@ var codelang = function () {
 	}
 
 	/** Alert **/
-	var wasClickedCounter = 0;
-	// create alert container
-	var alertOuter = document.createElement('div');
+	var wasClickedCounter = 0,
+	    alertOuter = document.createElement('div'); // create alert container
+
 	alertOuter.id = 'notie-alert-outer';
 
 	// Hide alert on click
@@ -90,14 +105,19 @@ var codelang = function () {
 	var alertTimeout2 = void 0;
 
 	function alert(type, message, seconds) {
-		if (options.colorText.length > 0) alertText.style.color = options.colorText;
+		if (options.colorText.length > 0) {
+			alertText.style.color = options.colorText;
+		}
+
 		blur();
+
 		wasClickedCounter++;
 		setTimeout(function () {
 			wasClickedCounter--;
 		}, options.animationDelay + 10);
 
 		if (wasClickedCounter === 1) {
+
 			if (alertIsShowing) {
 				clearTimeout(alertTimeout1);
 				clearTimeout(alertTimeout2);
@@ -129,16 +149,32 @@ var codelang = function () {
 		// Set notie type (background color)
 		switch (type) {
 			case 1:
-				if (options.colorSuccess.length > 0) alertOuter.style.backgroundColor = options.colorSuccess;else addClass(alertOuter, 'notie-background-success');
+				if (options.colorSuccess.length > 0) {
+					alertOuter.style.backgroundColor = options.colorSuccess;
+				} else {
+					addClass(alertOuter, 'notie-background-success');
+				}
 				break;
 			case 2:
-				if (options.colorWarning.length > 0) alertOuter.style.backgroundColor = options.colorWarning;else addClass(alertOuter, 'notie-background-warning');
+				if (options.colorWarning.length > 0) {
+					alertOuter.style.backgroundColor = options.colorWarning;
+				} else {
+					addClass(alertOuter, 'notie-background-warning');
+				}
 				break;
 			case 3:
-				if (options.colorError.length > 0) alertOuter.style.backgroundColor = options.colorError;else addClass(alertOuter, 'notie-background-error');
+				if (options.colorError.length > 0) {
+					alertOuter.style.backgroundColor = options.colorError;
+				} else {
+					addClass(alertOuter, 'notie-background-error');
+				}
 				break;
 			case 4:
-				if (options.colorInfo.length > 0) alertOuter.style.backgroundColor = options.colorInfo;else addClass(alertOuter, 'notie-background-info');
+				if (options.colorInfo.length > 0) {
+					alertOuter.style.backgroundColor = options.colorInfo;
+				} else {
+					addClass(alertOuter, 'notie-background-info');
+				}
 				break;
 		}
 		// Set notie text
@@ -146,6 +182,7 @@ var codelang = function () {
 		alertOuter.style.top = '-10000px';
 		alertOuter.style.display = 'table';
 		alertOuter.style.top = '-' + alertOuter.offsetHeight - 5 + 'px';
+
 		alertTimeout1 = setTimeout(function () {
 			addClass(alertOuter, 'notie-transition');
 			alertOuter.style.top = 0;
@@ -160,9 +197,11 @@ var codelang = function () {
 	function alertHide(callback) {
 		alertOuter.style.top = '-' + alertOuter.offsetHeight - 5 + 'px';
 		setTimeout(function () {
+
 			removeClass(alertOuter, 'notie-transition');
 			alertOuter.style.top = '-10000px';
 			alertIsShowing = false;
+
 			if (callback) {
 				callback();
 			}
@@ -297,6 +336,7 @@ var codelang = function () {
 				addClass(inputOuter, 'notie-transition');
 				inputOuter.style.top = 0;
 				inputBackground.style.opacity = '0.75';
+
 				setTimeout(function () {
 					inputIsShowing = true;
 					inputField.focus();
@@ -373,9 +413,18 @@ var codelang = function () {
 	var confirmIsShowing = false;
 
 	function confirm(title, yesText, noText, yesCallback, noCallback) {
-		if (options.colorInfo.length > 0) confirmInner.style.backgroundColor = options.colorInfo;
-		if (options.colorSuccess.length > 0) confirmYes.style.backgroundColor = options.colorSuccess;
-		if (options.colorError.length > 0) confirmNo.style.backgroundColor = options.colorError;
+		if (options.colorInfo.length > 0) {
+			confirmInner.style.backgroundColor = options.colorInf;
+		}
+
+		if (options.colorSuccess.length > 0) {
+			confirmYes.style.backgroundColor = options.colorSuccess;
+		}
+
+		if (options.colorError.length > 0) {
+			confirmNo.style.backgroundColor = options.colorError;
+		}
+
 		if (options.colorText.length > 0) {
 			confirmText.style.color = options.colorText;
 			confirmTextYes.style.color = options.colorText;
@@ -473,6 +522,7 @@ var codelang = function () {
 			element.className += ' ' + className;
 		}
 	}
+
 	function removeClass(element, className) {
 		if (element.classList) {
 			element.classList.remove(className);
@@ -484,18 +534,22 @@ var codelang = function () {
 	function blur() {
 		document.activeElement.blur();
 	}
+
 	var originalBodyHeight = void 0,
 	    originalBodyOverflow = void 0;
+
 	function scrollDisable() {
 		originalBodyHeight = document.body.style.height;
 		originalBodyOverflow = document.body.style.overflow;
 		document.body.style.height = '100%';
 		document.body.style.overflow = 'hidden';
 	}
+
 	function scrollEnable() {
 		document.body.style.height = originalBodyHeight;
 		document.body.style.overflow = originalBodyOverflow;
 	}
+
 	window.addEventListener('keydown', function (event) {
 		var enterClicked = event.which === 13 || event.keyCode === 13;
 		var escapeClicked = event.which === 27 || event.keyCode === 27;
@@ -514,8 +568,8 @@ var codelang = function () {
 
 	//Start application with args (category, interval)
 	var codelangStart = function codelangStart() {
-		var category = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
-		var minutesInterval = arguments.length <= 1 || arguments[1] === undefined ? 15 : arguments[1];
+		var category = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+		var minutesInterval = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 15;
 
 		var request = new XMLHttpRequest();
 		var phrases = {};
@@ -550,14 +604,19 @@ var codelang = function () {
 			put("codelang", JSON.stringify(user));
 			put("even", true);
 		}
+
 		function getRandomQuestion() {
-			var randOddNumber = 1;
+			var randOddNumber = 1,
+			    randQuestion = void 0,
+			    responseQuestion = void 0;
+
 			var rand = Math.floor(Math.random() * phrases.length);
 			if (rand != 0) randOddNumber = rand % 2 == 0 ? rand - 1 : rand; //need to be odd 
 
-			var randQuestion = phrases[randOddNumber].toLowerCase();
+			randQuestion = phrases[randOddNumber].toLowerCase();
 			randQuestion = removeDot(randQuestion);
-			var responseQuestion = phrases[randOddNumber - 1].toLowerCase();
+
+			responseQuestion = phrases[randOddNumber - 1].toLowerCase();
 			responseQuestion = removeDot(responseQuestion);
 
 			// console.log(randQuestion, responseQuestion);
@@ -568,17 +627,20 @@ var codelang = function () {
 			// console.log('-->',responseQuestion);
 			seeQuestion(randQuestion, responseQuestion);
 		}
+
 		//remove dot in final str
 		function removeDot(line) {
 			return line[line.length - 1] === '.' ? line.slice(0, line.indexOf(line[line.length - 1])) //final text
 			: /* ;^;  */line;
 		}
+
 		//check response with value entered, with multiple response
 		function checkResponse(response, valueEntered) {
 			return response.some(function (n) {
 				return n.toLowerCase() === valueEntered.toLowerCase();
 			});
 		}
+
 		//if checked is true, codelang alert!
 		function seeQuestion(phrase, response) {
 			input({
@@ -586,7 +648,11 @@ var codelang = function () {
 				placeholder: 'Translate to portuguese here',
 				prefilledValue: ''
 			}, phrase, 'Submit', 'I don\'t know =(', function (valueEntered) {
-				if (checkResponse(response, valueEntered)) alert(1, 'Right! 👊 (• ͜ʖ•)', 2);else alert(3, '<b>' + response + '</b> =(', 2);
+				if (checkResponse(response, valueEntered)) {
+					alert(1, 'Right! 👊 (• ͜ʖ•)', 2);
+				} else {
+					alert(3, '<b>' + response + '</b> =(', 2);
+				}
 			}, function (valueEntered) {
 				alert(3, '<b>' + response + '</b>', 2);
 			});
@@ -622,11 +688,11 @@ var codelang = function () {
 					return n.slice(0, n.indexOf('.txt')).slice(0, n.indexOf('-pt')).slice(0, n.indexOf('-eng')).replace(/-/g, ' ');
 				});
 				//print
-				console.log("1º arg: CATEGORIES: ");
+				console.log("1\xBA arg: CATEGORIES: ");
 				content.map(function (n, i) {
 					return console.log(n + ": ", i);
 				});
-				console.log("2º arg: Time interval");
+				console.log("2\xBA arg: Time interval");
 			}
 		};
 		request.send();
