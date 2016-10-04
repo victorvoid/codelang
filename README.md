@@ -43,7 +43,7 @@ var gulp = require( "gulp" ),
 codelang = require('codelang');
 
 gulp.task('codelang', function () {
-	codelang.start();
+	codelang.start(); //options:: codelang.start(1,2) [category of phrases, interval minutes] 
 })
 
 gulp.task('default', ['codelang']);
