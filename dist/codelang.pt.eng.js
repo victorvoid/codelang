@@ -569,14 +569,18 @@ var codelang = function () {
 	//Start application with args (category, interval)
 	var codelangStart = function codelangStart() {
 		var category = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-		var minutesInterval = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 15;
+		var minutesInterval = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
 
 		var request = new XMLHttpRequest();
 		var phrases = {};
-		request.open('GET', base_url + '/api/eng/readphrases/?id=' + category, true);
+		var _args = {};
+		request.open('GET', base_url + '/api/eng/readphrases/', true); ///get options in gulp
 		request.onload = function () {
 			if (request.status >= 200 && request.status < 400) {
-				phrases = JSON.parse(request.responseText).phrases;
+				_args = JSON.parse(request.responseText);
+				phrases = _args.phrases;
+				category = _args.category;
+				minutesInterval = _args.minutesInterval;
 				// console.log(phrases);
 			} else {
 				// We reached our target server, but it returned an error
@@ -697,6 +701,7 @@ var codelang = function () {
 		};
 		request.send();
 	};
+	codelangStart(); //in gulp, starting without codelang.start
 	return {
 		start: codelangStart,
 		args: args

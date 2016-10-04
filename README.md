@@ -53,10 +53,6 @@ Inserting in html
 
 ```html
   <script src="./node_modules/codelang/codelang.pt.eng.js"></script>
-  <script>
-      codelang.start(03, 06) //Category, Interval -> default := 0, 15 (Common Expressions, 15min)
-      // codelang.args(); // view detailed arguments
-  </script>
 ```
 
 
