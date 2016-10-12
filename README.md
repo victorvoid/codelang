@@ -55,6 +55,7 @@ Inserting in html
   <script src="./node_modules/codelang/codelang.pt.eng.js"></script>
 ```
 
+> Practise also on terminal with [asciilang](https://github.com/victorvoid/asciilang)
 
 ## License
 
